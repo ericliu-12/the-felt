@@ -31,8 +31,9 @@ export default function SessionBarChart({ entries }) {
           tickFormatter={v => `$${v}`}
         />
         <Tooltip
-          contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text)' }}
+          contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8 }}
           labelStyle={{ color: 'var(--text)' }}
+          itemStyle={{ color: 'var(--text)' }}
           formatter={v => [`$${Number(v).toFixed(2)}`, 'Profit']}
         />
         <Bar dataKey="profit" radius={[4, 4, 0, 0]}>
