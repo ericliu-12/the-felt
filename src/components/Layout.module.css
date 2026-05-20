@@ -20,6 +20,27 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
+.adminBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.625rem;
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.adminBtn:hover { border-color: var(--gold); color: var(--gold); }
+
+.adminActive {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
 .logo {
   font-family: var(--font-display);
   font-size: 1.25rem;

@@ -1,14 +1,24 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSessions } from '../hooks/useSessions'
+import { useSessions }   from '../hooks/useSessions'
+import { useAdminMode }  from '../hooks/useAdminMode'
 import LoadingState from '../components/LoadingState'
 import ErrorBanner  from '../components/ErrorBanner'
 import styles from './Sessions.module.css'
 
 export default function Sessions() {
   const navigate = useNavigate()
-  const { sessions, loading, error } = useSessions()
+  const { sessions, loading, error, deleteSession } = useSessions()
+  const { isAdmin } = useAdminMode()
+  const [mutErr, setMutErr] = useState(null)
 
   if (loading) return <LoadingState rows={5} />
+
+  async function handleDelete(id, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    setMutErr(null)
+    try { await deleteSession(id) } catch (e) { setMutErr(e.message) }
+  }
 
   return (
     <div className={styles.page}>
@@ -19,7 +29,7 @@ export default function Sessions() {
         </button>
       </div>
 
-      <ErrorBanner message={error} />
+      <ErrorBanner message={error || mutErr} />
 
       {sessions.length === 0 ? (
         <div className={styles.empty}>
@@ -35,7 +45,17 @@ export default function Sessions() {
               <div key={s.id} className={styles.sessionCard} onClick={() => navigate(`/sessions/${s.id}`)}>
                 <div className={styles.cardTop}>
                   <span className={styles.name}>{s.name}</span>
-                  <span className={`${styles.badge} ${styles[s.status]}`}>{s.status}</span>
+                  <div className={styles.cardTopRight}>
+                    <span className={`${styles.badge} ${styles[s.status]}`}>{s.status}</span>
+                    {isAdmin && (
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={ev => { ev.stopPropagation(); handleDelete(s.id, s.name) }}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className={styles.meta}>
                   <span>{new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}</span>

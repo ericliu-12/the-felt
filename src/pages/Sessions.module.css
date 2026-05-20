@@ -41,9 +41,31 @@
 
 .cardTop {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
 }
+
+.cardTopRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deleteBtn {
+  background: none;
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  padding: 0.125rem 0.5rem;
+  color: var(--red);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.deleteBtn:hover { background: rgba(224, 82, 82, 0.1); }
 
 .name {
   font-family: var(--font-display);

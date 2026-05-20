@@ -73,6 +73,22 @@ export function useSession(id) {
     if (error) throw new Error(error.message)
   }
 
+  async function renameSession(name) {
+    const { error } = await supabase
+      .from('sessions')
+      .update({ name: name.trim() })
+      .eq('id', id)
+    if (error) throw new Error(error.message)
+  }
+
+  async function reopenSession() {
+    const { error } = await supabase
+      .from('sessions')
+      .update({ status: 'open' })
+      .eq('id', id)
+    if (error) throw new Error(error.message)
+  }
+
   async function deleteEntry(entryId) {
     const { error } = await supabase
       .from('session_entries')
@@ -81,5 +97,5 @@ export function useSession(id) {
     if (error) throw new Error(error.message)
   }
 
-  return { session, entries, loading, error, addEntry, updateEntry, closeSession, deleteEntry }
+  return { session, entries, loading, error, addEntry, updateEntry, closeSession, deleteEntry, renameSession, reopenSession }
 }

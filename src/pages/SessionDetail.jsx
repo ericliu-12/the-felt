@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useSession } from '../hooks/useSession'
-import { usePlayers } from '../hooks/usePlayers'
+import { useSession }    from '../hooks/useSession'
+import { usePlayers }    from '../hooks/usePlayers'
+import { useAdminMode }  from '../hooks/useAdminMode'
 import { computeSettlement } from '../lib/settlement'
 import LoadingState      from '../components/LoadingState'
 import ErrorBanner       from '../components/ErrorBanner'
@@ -12,11 +13,14 @@ import styles from './SessionDetail.module.css'
 export default function SessionDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { session, entries, loading, error, addEntry, updateEntry, closeSession } = useSession(id)
+  const { session, entries, loading, error, addEntry, updateEntry, closeSession, renameSession, reopenSession } = useSession(id)
   const { players, addPlayer } = usePlayers()
-  const [mutErr, setMutErr]   = useState(null)
-  const [newName, setNewName] = useState('')
-  const [saving, setSaving]   = useState(false)
+  const { isAdmin } = useAdminMode()
+  const [mutErr, setMutErr]       = useState(null)
+  const [newName, setNewName]     = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [renaming, setRenaming]   = useState(false)
+  const [renameVal, setRenameVal] = useState('')
 
   if (loading) return <LoadingState rows={6} />
   if (!session) return <p style={{ color: 'var(--text-muted)', padding: '2rem' }}>Session not found.</p>
@@ -63,17 +67,47 @@ export default function SessionDetail() {
     try { await addPlayer(newName.trim()); setNewName('') } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
   }
 
+  async function handleRename() {
+    if (!renameVal.trim() || renameVal.trim() === session.name) { setRenaming(false); return }
+    setSaving(true); setMutErr(null)
+    try { await renameSession(renameVal); setRenaming(false) } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
+  }
+
+  async function handleReopen() {
+    if (!confirm('Reopen this session? Players will be able to edit cash-outs again.')) return
+    setSaving(true); setMutErr(null)
+    try { await reopenSession() } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate('/sessions')}
-          >
+          <button className={styles.backBtn} onClick={() => navigate('/sessions')}>
             ← Sessions
           </button>
-          <h1 className={styles.title}>{session.name}</h1>
+          {renaming ? (
+            <div className={styles.renameRow}>
+              <input
+                className={styles.renameInput}
+                value={renameVal}
+                onChange={e => setRenameVal(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setRenaming(false) }}
+                autoFocus
+              />
+              <button className={styles.renameSave} onClick={handleRename} disabled={saving}>Save</button>
+              <button className={styles.renameCancel} onClick={() => setRenaming(false)}>Cancel</button>
+            </div>
+          ) : (
+            <div className={styles.titleRow}>
+              <h1 className={styles.title}>{session.name}</h1>
+              {isAdmin && (
+                <button className={styles.editBtn} onClick={() => { setRenameVal(session.name); setRenaming(true) }}>
+                  Edit
+                </button>
+              )}
+            </div>
+          )}
           <span className={styles.meta}>
             {new Date(session.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
           </span>
@@ -104,9 +138,7 @@ export default function SessionDetail() {
                 {isOpen ? (
                   <input
                     className={styles.amountInput}
-                    type="number"
-                    min="0"
-                    step="0.01"
+                    type="number" min="0" step="0.01"
                     defaultValue={e.total_buyin}
                     onBlur={ev => handleUpdateBuyin(e.id, ev.target.value)}
                   />
@@ -118,9 +150,7 @@ export default function SessionDetail() {
                 {isOpen ? (
                   <input
                     className={styles.amountInput}
-                    type="number"
-                    min="0"
-                    step="0.01"
+                    type="number" min="0" step="0.01"
                     defaultValue={e.cashout ?? ''}
                     placeholder="—"
                     onBlur={ev => handleUpdateCashout(e.id, ev.target.value)}
@@ -186,11 +216,7 @@ export default function SessionDetail() {
               + Add
             </button>
           </div>
-          <button
-            className={styles.closeBtn}
-            disabled={!allCashedOut || saving}
-            onClick={handleClose}
-          >
+          <button className={styles.closeBtn} disabled={!allCashedOut || saving} onClick={handleClose}>
             {saving ? 'Closing…' : 'Close & Settle'}
           </button>
           {!allCashedOut && entries.length > 0 && (
@@ -203,10 +229,23 @@ export default function SessionDetail() {
 
       {!isOpen && (
         <>
+          {entries.length > 0 && (
+            <div className={`${styles.discrepancyBadge} ${balanceDiff === 0 ? styles.balanced : styles.discrepancy}`}>
+              {balanceDiff === 0
+                ? 'Balanced — totals match'
+                : `Discrepancy: ${balanceDiff > 0 ? '+' : '-'}$${Math.abs(balanceDiff).toFixed(2)} (in $${totalIn.toFixed(2)}, out $${totalOut.toFixed(2)})`
+              }
+            </div>
+          )}
           <span className={styles.sectionTitle}>Settlement</span>
           <SettlementDisplay transactions={settlement} />
           <span className={styles.sectionTitle}>Session Results</span>
           <SessionBarChart entries={entries} />
+          {isAdmin && (
+            <button className={styles.reopenBtn} onClick={handleReopen} disabled={saving}>
+              {saving ? 'Reopening…' : 'Reopen Session'}
+            </button>
+          )}
         </>
       )}
     </div>
