@@ -12,7 +12,7 @@ import styles from './SessionDetail.module.css'
 export default function SessionDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { session, entries, loading, error, addEntry, updateEntry, closeSession, deleteEntry } = useSession(id)
+  const { session, entries, loading, error, addEntry, updateEntry, closeSession } = useSession(id)
   const { players, addPlayer } = usePlayers()
   const [mutErr, setMutErr]   = useState(null)
   const [newName, setNewName] = useState('')
@@ -31,14 +31,14 @@ export default function SessionDetail() {
 
   async function handleUpdateBuyin(entryId, val) {
     const n = parseFloat(val)
-    if (isNaN(n)) return
+    if (isNaN(n) || n < 0) return
     setMutErr(null)
     try { await updateEntry(entryId, { total_buyin: n }) } catch (e) { setMutErr(e.message) }
   }
 
   async function handleUpdateCashout(entryId, val) {
     const n = parseFloat(val)
-    if (isNaN(n)) return
+    if (isNaN(n) || n < 0) return
     setMutErr(null)
     try { await updateEntry(entryId, { cashout: n }) } catch (e) { setMutErr(e.message) }
   }
@@ -64,7 +64,7 @@ export default function SessionDetail() {
       <div className={styles.header}>
         <div className={styles.titleBlock}>
           <button
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, fontSize: '0.875rem', marginBottom: '0.25rem' }}
+            className={styles.backBtn}
             onClick={() => navigate('/sessions')}
           >
             ← Sessions
@@ -129,7 +129,7 @@ export default function SessionDetail() {
                 className={styles.netAmount}
                 style={{ color: net === null ? 'var(--text-muted)' : net >= 0 ? 'var(--green)' : 'var(--red)' }}
               >
-                {net === null ? '—' : `${net >= 0 ? '+' : ''}$${Math.abs(net).toFixed(2)}`}
+                {net === null ? '—' : net >= 0 ? `+$${net.toFixed(2)}` : `-$${Math.abs(net).toFixed(2)}`}
               </span>
             </div>
           )
