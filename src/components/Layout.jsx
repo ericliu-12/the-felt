@@ -42,7 +42,6 @@ export default function Layout() {
         <nav className={styles.menu}>
           <button className={styles.menuItem} onClick={() => go('/')}>Home</button>
           <button className={styles.menuItem} onClick={() => go('/sessions')}>Sessions</button>
-          {isAdmin && <button className={styles.menuItem} onClick={() => go('/trainer')}>GTO Trainer</button>}
         </nav>
       )}
 
