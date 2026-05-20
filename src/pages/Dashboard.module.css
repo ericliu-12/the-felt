@@ -1,0 +1,123 @@
+.page { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+.newBtn {
+  background: var(--gold);
+  color: #0d0d0d;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background var(--transition);
+}
+
+.newBtn:hover { background: var(--gold-light); }
+
+.section { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.sectionTitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+.leaderboard { display: flex; flex-direction: column; }
+
+.leaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.5rem;
+}
+
+.leaderRow:hover { background: var(--bg-elevated); }
+
+.rank {
+  width: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rank.top { color: var(--gold); font-weight: 600; }
+
+.playerName {
+  flex: 1;
+  font-weight: 500;
+}
+
+.profit {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.recentSession {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sessionMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sessionName {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+}
+
+.sessionDate {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.sessionStats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.statusBadge.open   { background: rgba(76, 175, 125, 0.15); color: var(--green); }
+.statusBadge.closed { background: rgba(107, 107, 107, 0.2); color: var(--text-muted); }
