@@ -25,6 +25,10 @@ export default function SessionDetail() {
   const allCashedOut = entries.length > 0 && entries.every(e => e.cashout !== null)
   const addedIds = new Set(entries.map(e => e.player_id))
 
+  const totalIn = entries.reduce((s, e) => s + e.total_buyin, 0)
+  const totalOut = entries.reduce((s, e) => s + (e.cashout ?? 0), 0)
+  const balanceDiff = Math.round((totalOut - totalIn) * 100) / 100
+
   const settlement = !isOpen
     ? computeSettlement(entries.map(e => ({ name: e.playerName, totalBuyin: e.total_buyin, cashout: e.cashout ?? 0 })))
     : []
@@ -135,6 +139,25 @@ export default function SessionDetail() {
           )
         })}
       </div>
+
+      {isOpen && entries.length > 0 && (
+        <div className={styles.balanceRow}>
+          <div>
+            <span className={styles.balanceLabel}>In</span>
+            ${totalIn.toFixed(2)}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <span className={styles.balanceLabel}>Out</span>
+            ${totalOut.toFixed(2)}
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <span className={styles.balanceLabel}>Diff</span>
+            <span style={{ color: balanceDiff === 0 ? 'var(--green)' : 'var(--red)' }}>
+              {balanceDiff === 0 ? '✓ $0.00' : `${balanceDiff > 0 ? '+' : '-'}$${Math.abs(balanceDiff).toFixed(2)}`}
+            </span>
+          </div>
+        </div>
+      )}
 
       {isOpen && (
         <div className={styles.addPlayerSection}>

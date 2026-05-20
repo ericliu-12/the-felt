@@ -170,3 +170,25 @@
 .existingPlayerBtn:last-child { border-bottom: none; }
 .existingPlayerBtn:hover:not(:disabled) { background: var(--bg-elevated); }
 .existingPlayerBtn:disabled { color: var(--text-muted); cursor: default; }
+
+.balanceRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.balanceLabel {
+  display: block;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.125rem;
+}
