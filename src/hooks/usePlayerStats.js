@@ -10,7 +10,7 @@ export function usePlayerStats(playerId) {
   const [error,   setError]   = useState(null)
 
   useEffect(() => {
-    if (!playerId) return
+    if (!playerId) { setLoading(false); return }
     let mounted = true
 
     async function load() {

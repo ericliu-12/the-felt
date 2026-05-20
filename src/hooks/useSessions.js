@@ -37,6 +37,7 @@ export function useSessions() {
     const channel = supabase
       .channel('sessions-all')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions',       filter: `group_id=eq.${GROUP_ID}` }, load)
+      // session_entries has no group_id column so can't filter server-side; any group's change triggers a reload
       .on('postgres_changes', { event: '*', schema: 'public', table: 'session_entries' }, load)
       .subscribe()
 

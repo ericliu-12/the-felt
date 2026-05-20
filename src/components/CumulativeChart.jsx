@@ -26,16 +26,16 @@ export default function CumulativeChart({ sessions, players }) {
         if (entry && entry.cashout !== null) {
           cumulatives[p.id] += entry.cashout - entry.total_buyin
         }
-        point[p.name] = parseFloat(cumulatives[p.id].toFixed(2))
+        point[p.id] = parseFloat(cumulatives[p.id].toFixed(2))
       })
       return point
     })
   }, [sessions, players])
 
-  function togglePlayer(playerName) {
+  function togglePlayer(playerId) {
     setHidden(prev => {
       const next = new Set(prev)
-      next.has(playerName) ? next.delete(playerName) : next.add(playerName)
+      next.has(playerId) ? next.delete(playerId) : next.add(playerId)
       return next
     })
   }
@@ -66,16 +66,17 @@ export default function CumulativeChart({ sessions, players }) {
           formatter={(v, name) => [`$${Number(v).toFixed(2)}`, name]}
         />
         <Legend
-          onClick={e => togglePlayer(e.value)}
+          onClick={e => togglePlayer(e.dataKey)}
           wrapperStyle={{ fontSize: 12, cursor: 'pointer' }}
         />
         {players.map((p, idx) => (
           <Line
             key={p.id}
             type="monotone"
-            dataKey={p.name}
+            dataKey={p.id}
+            name={p.name}
             stroke={COLORS[idx % COLORS.length]}
-            strokeWidth={hidden.has(p.name) ? 0 : 2}
+            strokeWidth={hidden.has(p.id) ? 0 : 2}
             dot={false}
             activeDot={{ r: 4 }}
           />
