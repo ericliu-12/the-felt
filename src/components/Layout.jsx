@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, NavLink } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useAdminMode } from '../hooks/useAdminMode'
 import AdminModal from './AdminModal'
 import styles from './Layout.module.css'
@@ -7,29 +7,50 @@ import styles from './Layout.module.css'
 export default function Layout() {
   const { isAdmin, unlock, lock } = useAdminMode()
   const [modalOpen, setModalOpen] = useState(false)
+  const [menuOpen, setMenuOpen]   = useState(false)
+  const navigate = useNavigate()
+
+  function go(path) {
+    setMenuOpen(false)
+    navigate(path)
+  }
 
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
         <span className={styles.logo}>The Felt</span>
-        <button
-          className={`${styles.adminBtn} ${isAdmin ? styles.adminActive : ''}`}
-          onClick={() => isAdmin ? lock() : setModalOpen(true)}
-        >
-          {isAdmin ? 'Admin' : 'Admin'}
-        </button>
+        <div className={styles.headerRight}>
+          <button
+            className={`${styles.adminBtn} ${isAdmin ? styles.adminActive : ''}`}
+            onClick={() => isAdmin ? lock() : setModalOpen(true)}
+          >
+            Admin
+          </button>
+          <button
+            className={styles.hamburger}
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Menu"
+          >
+            <span className={`${styles.bar} ${menuOpen ? styles.barTop : ''}`} />
+            <span className={`${styles.bar} ${menuOpen ? styles.barMid : ''}`} />
+            <span className={`${styles.bar} ${menuOpen ? styles.barBot : ''}`} />
+          </button>
+        </div>
       </header>
+
+      {menuOpen && (
+        <div className={styles.menuOverlay} onClick={() => setMenuOpen(false)}>
+          <nav className={styles.menu} onClick={e => e.stopPropagation()}>
+            <button className={styles.menuItem} onClick={() => go('/')}>Home</button>
+            <button className={styles.menuItem} onClick={() => go('/sessions')}>Sessions</button>
+          </nav>
+        </div>
+      )}
+
       <main className={styles.main}>
         <Outlet />
       </main>
-      <nav className={styles.bottomNav}>
-        <NavLink to="/" end className={({ isActive }) => isActive ? styles.active : ''}>
-          Home
-        </NavLink>
-        <NavLink to="/sessions" className={({ isActive }) => isActive ? styles.active : ''}>
-          Sessions
-        </NavLink>
-      </nav>
+
       <AdminModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
