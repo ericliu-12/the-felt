@@ -39,12 +39,10 @@ export default function Layout() {
       </header>
 
       {menuOpen && (
-        <div className={styles.menuOverlay} onClick={() => setMenuOpen(false)}>
-          <nav className={styles.menu} onClick={e => e.stopPropagation()}>
-            <button className={styles.menuItem} onClick={() => go('/')}>Home</button>
-            <button className={styles.menuItem} onClick={() => go('/sessions')}>Sessions</button>
-          </nav>
-        </div>
+        <nav className={styles.menu}>
+          <button className={styles.menuItem} onClick={() => go('/')}>Home</button>
+          <button className={styles.menuItem} onClick={() => go('/sessions')}>Sessions</button>
+        </nav>
       )}
 
       <main className={styles.main}>
