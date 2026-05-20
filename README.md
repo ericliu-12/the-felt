@@ -12,6 +12,7 @@ A mobile-first poker night tracker for groups. Track buy-ins, cash-outs, session
 - **Leaderboard** — running P&L across all closed sessions with win rate and per-player stats
 - **Cumulative P&L chart** — multi-player line chart showing profit/loss over time
 - **Player profiles** — individual session history, best/worst sessions, personal P&L chart
+- **Session recap sharing** — share a results card (ranked players, winner callout, pot size, settlements) via the iOS/Android share sheet or download as PNG; copy a direct link to any session
 - **Discrepancy detection** — closed sessions flag when the pot doesn't balance
 - **Real-time sync** — all changes reflect live across devices via Supabase Realtime
 - **Admin mode** — PIN-protected controls for deleting sessions, renaming sessions/players, and reopening closed sessions
@@ -23,6 +24,7 @@ A mobile-first poker night tracker for groups. Track buy-ins, cash-outs, session
 | Frontend | React 19, Vite, CSS Modules |
 | Routing | React Router 7 |
 | Charts | Recharts |
+| Image capture | html2canvas |
 | Backend | Supabase (Postgres + Realtime) |
 | Hosting | Vercel |
 
