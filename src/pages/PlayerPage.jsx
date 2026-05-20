@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { usePlayerStats } from '../hooks/usePlayerStats'
+import { usePlayers } from '../hooks/usePlayers'
+import { useAdminMode } from '../hooks/useAdminMode'
 import LoadingState from '../components/LoadingState'
 import ErrorBanner  from '../components/ErrorBanner'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -15,6 +18,21 @@ export default function PlayerPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { player, stats, history, loading, error } = usePlayerStats(id)
+  const { renamePlayer } = usePlayers()
+  const { isAdmin } = useAdminMode()
+  const [renaming, setRenaming] = useState(false)
+  const [renameVal, setRenameVal] = useState('')
+
+  function startRename() {
+    setRenameVal(player?.name ?? '')
+    setRenaming(true)
+  }
+
+  async function saveRename() {
+    if (!renameVal.trim()) return
+    await renamePlayer(id, renameVal)
+    setRenaming(false)
+  }
 
   if (loading) return <LoadingState rows={8} />
 
@@ -24,7 +42,27 @@ export default function PlayerPage() {
 
       <ErrorBanner message={error} />
 
-      {player && <h1 className={styles.name}>{player.name}</h1>}
+      {player && !renaming && (
+        <div className={styles.nameRow}>
+          <h1 className={styles.name}>{player.name}</h1>
+          {isAdmin && (
+            <button className={styles.editBtn} onClick={startRename}>Edit</button>
+          )}
+        </div>
+      )}
+      {renaming && (
+        <div className={styles.renameRow}>
+          <input
+            className={styles.renameInput}
+            value={renameVal}
+            onChange={e => setRenameVal(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') saveRename(); if (e.key === 'Escape') setRenaming(false) }}
+            autoFocus
+          />
+          <button className={styles.saveBtn} onClick={saveRename}>Save</button>
+          <button className={styles.cancelBtn} onClick={() => setRenaming(false)}>Cancel</button>
+        </div>
+      )}
 
       {stats && (
         <div className={styles.statsGrid}>

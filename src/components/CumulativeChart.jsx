@@ -4,6 +4,28 @@ import {
   Legend, ResponsiveContainer,
 } from 'recharts'
 
+function CompactTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div style={{
+      background: 'var(--bg-elevated)',
+      border: '1px solid var(--border)',
+      borderRadius: 8,
+      padding: '0.375rem 0.625rem',
+      fontSize: 11,
+      maxWidth: 140,
+      pointerEvents: 'none',
+    }}>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
+      {payload.map((entry, i) => (
+        <p key={i} style={{ color: entry.color, margin: '0.1rem 0', whiteSpace: 'nowrap' }}>
+          {entry.name}: ${Number(entry.value).toFixed(2)}
+        </p>
+      ))}
+    </div>
+  )
+}
+
 const COLORS = ['#c9a84c', '#4caf7d', '#e05252', '#7b9fe0', '#e07bb0', '#7be0d4']
 
 export default function CumulativeChart({ sessions, players }) {
@@ -60,11 +82,7 @@ export default function CumulativeChart({ sessions, players }) {
           tickLine={false}
           tickFormatter={v => `$${v}`}
         />
-        <Tooltip
-          contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8 }}
-          labelStyle={{ color: 'var(--text-muted)', fontSize: 12 }}
-          formatter={(v, name) => [`$${Number(v).toFixed(2)}`, name]}
-        />
+        <Tooltip content={<CompactTooltip />} position={{ y: 0 }} />
         <Legend
           onClick={e => togglePlayer(e.dataKey)}
           wrapperStyle={{ fontSize: 12, cursor: 'pointer' }}

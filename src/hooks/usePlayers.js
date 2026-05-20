@@ -47,5 +47,13 @@ export function usePlayers() {
     if (error) throw new Error(error.message)
   }
 
-  return { players, loading, error, addPlayer }
+  async function renamePlayer(id, name) {
+    const { error } = await supabase
+      .from('players')
+      .update({ name: name.trim() })
+      .eq('id', id)
+    if (error) throw new Error(error.message)
+  }
+
+  return { players, loading, error, addPlayer, renamePlayer }
 }
