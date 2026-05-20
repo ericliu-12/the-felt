@@ -20,10 +20,10 @@ const RED_SUITS = new Set(['♥', '♦'])
 function CardDisplay({ text }) {
   return (
     <div className={styles.cards}>
-      {text.split(' ').map((card, i) => {
+      {text.split(' ').map((card) => {
         const suit = card.slice(-1)
         return (
-          <span key={i} className={`${styles.cardToken} ${RED_SUITS.has(suit) ? styles.redSuit : ''}`}>
+          <span key={card} className={`${styles.cardToken} ${RED_SUITS.has(suit) ? styles.redSuit : ''}`}>
             {card}
           </span>
         )

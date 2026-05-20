@@ -88,16 +88,16 @@
 
 .optBtn:disabled { cursor: default; }
 
-.correct {
-  border-color: var(--green) !important;
-  background: rgba(76, 175, 125, 0.1) !important;
-  color: var(--green) !important;
+.optBtn.correct {
+  border-color: var(--green);
+  background: rgba(76, 175, 125, 0.1);
+  color: var(--green);
 }
 
-.wrong {
-  border-color: var(--red) !important;
-  background: rgba(224, 82, 82, 0.1) !important;
-  color: var(--red) !important;
+.optBtn.wrong {
+  border-color: var(--red);
+  background: rgba(224, 82, 82, 0.1);
+  color: var(--red);
 }
 
 .dim { opacity: 0.35; }
@@ -129,7 +129,7 @@
 
 .nextBtn {
   background: var(--gold);
-  color: #0d0d0d;
+  color: var(--bg);
   border: none;
   border-radius: var(--radius);
   padding: 0.625rem 1.25rem;
