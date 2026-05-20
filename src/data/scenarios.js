@@ -234,7 +234,7 @@ export const scenarios = [
     hand: '6♦ 5♦', board: 'T♦ 8♣ 2♠',
     options: ['Fold', 'Call', 'Raise'],
     correct: 'Call',
-    explanation: '65d has an open-ended straight draw (any 4 or 9). Despite being out of position, you have 8 outs to the straight. Calling to realize that equity is correct — folding gives up too much.',
+    explanation: '65d has a gutshot straight draw (a 7 completes T-8-7-6-5) plus a backdoor nut flush draw. Against a small c-bet you have enough combined equity and implied odds to call — folding gives up too much.',
   },
   {
     id: 'fp-08', category: 'postflop',
@@ -266,7 +266,7 @@ export const scenarios = [
     hand: 'A♠ K♠', board: 'K♥ 7♦ 2♣ 3♥',
     options: ['Check', 'Bet 4bb (medium)', 'Bet 8bb (large)'],
     correct: 'Bet 4bb (medium)',
-    explanation: 'Top pair top kicker on a board that changed little (3h adds only a backdoor flush). Continue betting for value — your hand is very likely best. A medium bet extracts value from second pair and Kx without over-committing.',
+    explanation: 'Top pair top kicker on a board that changed little. The 3♥ creates two hearts on board, giving some BB hands a flush draw, but your hand is still very likely best. A medium bet extracts value from second pair and Kx without over-committing.',
   },
   {
     id: 'fp-12', category: 'postflop',
@@ -314,7 +314,7 @@ export const scenarios = [
     hand: '8♥ 8♦', board: 'K♣ K♦ 7♠ 2♥ J♦',
     options: ['Fold', 'Call', 'Raise'],
     correct: 'Fold',
-    explanation: "Pocket 8s on KK72J is a weak hand vs an 80% pot river bet. BTN is polarized — they have Kx, JJ, or bluffs. At this sizing you need to be right 44% of the time. 88 loses to all value and wins only vs bluffs — the math doesn't work, fold.",
+    explanation: "Pocket 8s on KK72J is a weak hand vs an 80% pot river bet. BTN is polarized — they have Kx, JJ, or bluffs. Facing 12bb into 15bb you need 31% equity (12/39). 88 loses to all of BTN's value hands and only beats bluffs — fold.",
   },
   {
     id: 'fp-18', category: 'postflop',
