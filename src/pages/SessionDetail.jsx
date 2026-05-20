@@ -96,29 +96,32 @@ export default function SessionDetail() {
     try {
       await document.fonts.ready
       const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: '#1a1a1a' })
-      canvas.toBlob(async blob => {
-        const safeName = session.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
-        const file = new File([blob], `the-felt-${safeName}.png`, { type: 'image/png' })
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: session.name })
-        } else {
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = file.name
-          a.click()
-          URL.revokeObjectURL(url)
-        }
-      }, 'image/png')
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const safeName = session.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+      const file = new File([blob], `the-felt-${safeName}.png`, { type: 'image/png' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: session.name })
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = file.name
+        a.click()
+        URL.revokeObjectURL(url)
+      }
     } finally {
       setSharing(false)
     }
   }
 
   async function handleCopyLink() {
-    await navigator.clipboard.writeText(window.location.href)
-    setCopying(true)
-    setTimeout(() => setCopying(false), 2000)
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopying(true)
+      setTimeout(() => setCopying(false), 2000)
+    } catch {
+      // clipboard unavailable — fail silently
+    }
   }
 
   return (
@@ -296,7 +299,7 @@ export default function SessionDetail() {
               {saving ? 'Reopening…' : 'Reopen Session'}
             </button>
           )}
-          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+          <div style={{ position: 'fixed', left: '-9999px', top: 0, pointerEvents: 'none' }}>
             <ShareCard
               ref={cardRef}
               sessionName={session.name}
