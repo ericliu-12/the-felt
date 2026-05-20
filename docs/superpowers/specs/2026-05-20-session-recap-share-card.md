@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add a share flow to the SessionDetail page (closed sessions only) that lets any user download a PNG results card and copy a direct link to the session.
+Add a share flow to the SessionDetail page (closed sessions only) that lets any user share a PNG results card (via native share sheet on mobile, PNG download on desktop) and copy a direct link to the session.
 
 ## Architecture
 
@@ -67,10 +67,19 @@ Fixed width: **360px**. Height: auto (grows with player count).
 
 ## Share Buttons
 
-Rendered below the Settlement section on closed sessions. Two side-by-side pill buttons:
+Rendered below the Settlement section on closed sessions. Two side-by-side pill buttons: **Share Image** and **Copy Link**.
 
-- **Download Image** — calls `html2canvas(cardRef.current, { scale: 2 })` then triggers PNG download as `the-felt-[session-name].png`. Before capture, waits for `document.fonts.ready` to ensure fonts are loaded.
-- **Copy Link** — calls `navigator.clipboard.writeText(window.location.href)`, then shows inline confirmation text "Copied!" for 2 seconds.
+### Share Image
+
+1. Wait for `document.fonts.ready`.
+2. Call `html2canvas(cardRef.current, { scale: 2 })` to get a canvas.
+3. Convert to blob: `canvas.toBlob(blob => ..., 'image/png')`.
+4. **Mobile (Web Share API available):** check `navigator.canShare({ files: [file] })` — if true, call `navigator.share({ files: [file], title: sessionName })`. This opens the iOS/Android share sheet where the user can Save Image to Photos, send via iMessage, AirDrop, etc.
+5. **Desktop fallback:** if Web Share API is unavailable or `canShare` returns false, create an `<a>` with `href = URL.createObjectURL(blob)` and `download = "the-felt-[session-name].png"` and click it.
+
+### Copy Link
+
+Calls `navigator.clipboard.writeText(window.location.href)`, then shows inline confirmation text "Copied!" for 2 seconds (driven by `copying` state).
 
 The `ShareCard` div is mounted off-screen (`position: absolute; left: -9999px`) so it exists in the DOM for capture but is invisible to the user.
 
@@ -78,11 +87,9 @@ The `ShareCard` div is mounted off-screen (`position: absolute; left: -9999px`) 
 
 In `SessionDetail.jsx`:
 - `copying` — boolean, drives the "Copied!" label on the copy button
-
-No other new state needed. `html2canvas` is called on-demand inside the download handler.
+- `sharing` — boolean, prevents double-tap while html2canvas is running
 
 ## What This Is Not
 
-- No native share sheet (Web Share API) — download + clipboard covers both mobile and desktop simply
 - No server-side image generation
 - No new Supabase queries — all data already loaded in SessionDetail
