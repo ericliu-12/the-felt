@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSession }    from '../hooks/useSession'
 import { usePlayers }    from '../hooks/usePlayers'
 import { useAdminMode }  from '../hooks/useAdminMode'
 import { computeSettlement } from '../lib/settlement'
+import { prepareCardEntries } from '../lib/shareCard'
+import html2canvas from 'html2canvas'
 import LoadingState      from '../components/LoadingState'
 import ErrorBanner       from '../components/ErrorBanner'
 import SettlementDisplay from '../components/SettlementDisplay'
 import SessionBarChart   from '../components/SessionBarChart'
+import ShareCard         from '../components/ShareCard'
 import styles from './SessionDetail.module.css'
 
 export default function SessionDetail() {
@@ -21,6 +24,9 @@ export default function SessionDetail() {
   const [saving, setSaving]       = useState(false)
   const [renaming, setRenaming]   = useState(false)
   const [renameVal, setRenameVal] = useState('')
+  const [sharing, setSharing]   = useState(false)
+  const [copying, setCopying]   = useState(false)
+  const cardRef = useRef(null)
 
   if (loading) return <LoadingState rows={6} />
   if (!session) return <p style={{ color: 'var(--text-muted)', padding: '2rem' }}>Session not found.</p>
@@ -36,6 +42,11 @@ export default function SessionDetail() {
   const settlement = !isOpen
     ? computeSettlement(entries.map(e => ({ name: e.playerName, totalBuyin: e.total_buyin, cashout: e.cashout ?? 0 })))
     : []
+
+  const cardEntries = !isOpen ? prepareCardEntries(entries) : []
+  const cardDate = new Date(session.date).toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+  })
 
   async function handleUpdateBuyin(entryId, val) {
     const n = parseFloat(val)
@@ -77,6 +88,37 @@ export default function SessionDetail() {
     if (!confirm('Reopen this session? Players will be able to edit cash-outs again.')) return
     setSaving(true); setMutErr(null)
     try { await reopenSession() } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
+  }
+
+  async function handleShare() {
+    if (sharing) return
+    setSharing(true)
+    try {
+      await document.fonts.ready
+      const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: '#1a1a1a' })
+      canvas.toBlob(async blob => {
+        const safeName = session.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()
+        const file = new File([blob], `the-felt-${safeName}.png`, { type: 'image/png' })
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: session.name })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = file.name
+          a.click()
+          URL.revokeObjectURL(url)
+        }
+      }, 'image/png')
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  async function handleCopyLink() {
+    await navigator.clipboard.writeText(window.location.href)
+    setCopying(true)
+    setTimeout(() => setCopying(false), 2000)
   }
 
   return (
@@ -239,6 +281,14 @@ export default function SessionDetail() {
           )}
           <span className={styles.sectionTitle}>Settlement</span>
           <SettlementDisplay transactions={settlement} />
+          <div className={styles.shareRow}>
+            <button className={styles.shareBtn} onClick={handleShare} disabled={sharing}>
+              {sharing ? 'Preparing…' : 'Share Image'}
+            </button>
+            <button className={styles.shareBtn} onClick={handleCopyLink}>
+              {copying ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
           <span className={styles.sectionTitle}>Session Results</span>
           <SessionBarChart entries={entries} />
           {isAdmin && (
@@ -246,6 +296,16 @@ export default function SessionDetail() {
               {saving ? 'Reopening…' : 'Reopen Session'}
             </button>
           )}
+          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+            <ShareCard
+              ref={cardRef}
+              sessionName={session.name}
+              date={cardDate}
+              entries={cardEntries}
+              totalPot={totalIn}
+              settlement={settlement}
+            />
+          </div>
         </>
       )}
     </div>

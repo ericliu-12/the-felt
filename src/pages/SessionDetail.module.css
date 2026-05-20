@@ -287,3 +287,24 @@
   white-space: nowrap;
   cursor: pointer;
 }
+
+.shareRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.shareBtn {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.shareBtn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.shareBtn:disabled { opacity: 0.4; cursor: not-allowed; }
