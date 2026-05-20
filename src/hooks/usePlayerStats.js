@@ -11,6 +11,7 @@ export function usePlayerStats(playerId) {
 
   useEffect(() => {
     if (!playerId) return
+    let mounted = true
 
     async function load() {
       const [{ data: playerData, error: pErr }, { data: entries, error: eErr }] = await Promise.all([
@@ -20,6 +21,8 @@ export function usePlayerStats(playerId) {
           .select('total_buyin, cashout, sessions(id, name, date, status, group_id)')
           .eq('player_id', playerId),
       ])
+
+      if (!mounted) return
 
       if (pErr || eErr) {
         setError((pErr || eErr).message)
@@ -36,8 +39,8 @@ export function usePlayerStats(playerId) {
 
       let cumulative = 0
       const hist = closed.map(e => {
-        const profit = e.cashout - e.total_buyin
-        cumulative += profit
+        const profit = Math.round((e.cashout - e.total_buyin) * 100) / 100
+        cumulative = Math.round((cumulative + profit) * 100) / 100
         return {
           sessionId:   e.sessions.id,
           sessionName: e.sessions.name,
@@ -51,12 +54,12 @@ export function usePlayerStats(playerId) {
 
       const profits = hist.map(h => h.profit)
       const sessionsPlayed = profits.length
-      const totalProfit    = profits.reduce((s, p) => s + p, 0)
+      const totalProfit    = Math.round(profits.reduce((s, p) => s + p, 0) * 100) / 100
       const biggestWin     = sessionsPlayed > 0 ? Math.max(...profits) : 0
       const biggestLoss    = sessionsPlayed > 0 ? Math.min(...profits) : 0
       const wins           = profits.filter(p => p > 0).length
       const winRate        = sessionsPlayed > 0 ? wins / sessionsPlayed : 0
-      const avgProfit      = sessionsPlayed > 0 ? totalProfit / sessionsPlayed : 0
+      const avgProfit      = sessionsPlayed > 0 ? Math.round((totalProfit / sessionsPlayed) * 100) / 100 : 0
 
       setHistory(hist)
       setStats({ totalProfit, biggestWin, biggestLoss, sessionsPlayed, winRate, avgProfit })
@@ -64,6 +67,7 @@ export function usePlayerStats(playerId) {
     }
 
     load()
+    return () => { mounted = false }
   }, [playerId])
 
   return { player, stats, history, loading, error }

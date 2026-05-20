@@ -10,6 +10,9 @@ export function useSession(id) {
   useEffect(() => {
     if (!id) return
     let mounted = true
+    setSession(null)
+    setEntries([])
+    setLoading(true)
 
     async function load() {
       const [{ data: s, error: sErr }, { data: e, error: eErr }] = await Promise.all([
@@ -22,11 +25,12 @@ export function useSession(id) {
       if (sErr || eErr) {
         setError((sErr || eErr).message)
       } else {
+        setError(null)
         setSession(s)
         setEntries(
           e
             .map(entry => ({ ...entry, playerName: entry.players?.name ?? 'Unknown' }))
-            .sort((a, b) => a.playerName.localeCompare(b.playerName))
+            .sort((a, b) => a.playerName.localeCompare(b.playerName) || a.id.localeCompare(b.id))
         )
       }
       setLoading(false)

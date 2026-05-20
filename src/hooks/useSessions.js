@@ -28,7 +28,7 @@ export function useSessions() {
 
       if (!mounted) return
       if (error) setError(error.message)
-      else setSessions(data)
+      else { setError(null); setSessions(data) }
       setLoading(false)
     }
 

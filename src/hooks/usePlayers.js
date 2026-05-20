@@ -19,7 +19,7 @@ export function usePlayers() {
 
       if (!mounted) return
       if (error) setError(error.message)
-      else setPlayers(data)
+      else { setError(null); setPlayers(data) }
       setLoading(false)
     }
 
