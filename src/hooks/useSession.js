@@ -8,7 +8,7 @@ export function useSession(id) {
   const [error, setError]     = useState(null)
 
   useEffect(() => {
-    if (!id) return
+    if (!id) { setLoading(false); return }
     let mounted = true
     setSession(null)
     setEntries([])

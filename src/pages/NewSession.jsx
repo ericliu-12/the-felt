@@ -43,6 +43,7 @@ export default function NewSession() {
   async function handleAddExistingPlayer(playerId) {
     const alreadyAdded = entries.some(e => e.player_id === playerId)
     if (alreadyAdded) return
+    setMutErr(null)
     try {
       await addEntry(playerId)
     } catch (e) {
@@ -67,6 +68,7 @@ export default function NewSession() {
   async function handleBuyinChange(entryId, value) {
     const num = parseFloat(value)
     if (isNaN(num) || num < 0) return
+    setMutErr(null)
     try {
       await updateEntry(entryId, { total_buyin: num })
     } catch (e) {
@@ -77,6 +79,7 @@ export default function NewSession() {
   async function handleCashoutChange(entryId, value) {
     const num = parseFloat(value)
     if (isNaN(num) || num < 0) return
+    setMutErr(null)
     try {
       await updateEntry(entryId, { cashout: num })
     } catch (e) {
