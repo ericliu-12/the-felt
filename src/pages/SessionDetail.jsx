@@ -299,7 +299,7 @@ export default function SessionDetail() {
               {saving ? 'Reopening…' : 'Reopen Session'}
             </button>
           )}
-          <div style={{ position: 'fixed', left: '-9999px', top: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
             <ShareCard
               ref={cardRef}
               sessionName={session.name}
