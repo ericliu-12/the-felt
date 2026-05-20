@@ -15,7 +15,11 @@ const ShareCard = forwardRef(function ShareCard({ sessionName, date, entries, to
         <div className={styles.winnerRow}>
           <span className={styles.trophy}>🏆</span>
           <span className={styles.winnerName}>{winner.name}</span>
-          <span className={styles.winnerNet}>+${winner.net.toFixed(2)}</span>
+          <span className={styles.winnerNet}>
+            {winner.net >= 0
+              ? `+$${winner.net.toFixed(2)}`
+              : `-$${Math.abs(winner.net).toFixed(2)}`}
+          </span>
         </div>
       )}
 
@@ -23,7 +27,7 @@ const ShareCard = forwardRef(function ShareCard({ sessionName, date, entries, to
 
       <div className={styles.playerList}>
         {entries.map((e, i) => (
-          <div key={e.name} className={styles.playerRow}>
+          <div key={i} className={styles.playerRow}>
             <span className={styles.rank}>{i + 1}.</span>
             <span className={styles.playerName}>{e.name}</span>
             <span
