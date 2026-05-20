@@ -5,6 +5,7 @@ import Sessions from './pages/Sessions'
 import NewSession from './pages/NewSession'
 import SessionDetail from './pages/SessionDetail'
 import PlayerPage from './pages/PlayerPage'
+import TrainerPage from './pages/TrainerPage'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/sessions/new"  element={<NewSession />} />
           <Route path="/sessions/:id"  element={<SessionDetail />} />
           <Route path="/players/:id"   element={<PlayerPage />} />
+          <Route path="/trainer"       element={<TrainerPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
