@@ -88,7 +88,7 @@ export default function PlayerPage() {
           </div>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Best Session</span>
-            <span className={`${styles.statValue} profit`}>{fmt(stats.biggestWin)}</span>
+            <span className={`${styles.statValue} ${stats.biggestWin >= 0 ? 'profit' : 'loss'}`}>{fmt(stats.biggestWin)}</span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Worst Session</span>
