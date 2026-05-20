@@ -54,7 +54,9 @@ export default function PlayerPage() {
           </div>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Worst Session</span>
-            <span className={`${styles.statValue} loss`}>{fmt(stats.biggestLoss)}</span>
+            <span className={`${styles.statValue} ${stats.biggestLoss < 0 ? 'loss' : 'profit'}`}>
+              {fmt(stats.biggestLoss, false)}
+            </span>
           </div>
         </div>
       )}
@@ -126,9 +128,7 @@ export default function PlayerPage() {
       )}
 
       {history.length === 0 && !loading && (
-        <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>
-          No closed sessions yet.
-        </p>
+        <p className={styles.emptyState}>No closed sessions yet.</p>
       )}
     </div>
   )
