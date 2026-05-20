@@ -34,11 +34,11 @@ export default function SessionBarChart({ entries }) {
           contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8 }}
           formatter={v => [`$${Number(v).toFixed(2)}`, 'Profit']}
         />
-        {data.map((d, i) => (
-          <Bar key={i} dataKey="profit" radius={[4, 4, 0, 0]}>
-            <Cell fill={d.profit >= 0 ? 'var(--green)' : 'var(--red)'} />
-          </Bar>
-        ))}
+        <Bar dataKey="profit" radius={[4, 4, 0, 0]}>
+          {data.map((d, i) => (
+            <Cell key={i} fill={d.profit >= 0 ? 'var(--green)' : 'var(--red)'} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   )
