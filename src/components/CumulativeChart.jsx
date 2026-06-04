@@ -21,6 +21,8 @@ function makeTooltip(hidden) {
     if (!visible.length) return null
     const shown = visible.slice(0, MAX_TOOLTIP)
     const extra = visible.length - shown.length
+    const sessionName = payload[0]?.payload?._label
+    const header = sessionName ? `${sessionName} — ${label}` : label
     return (
       <div style={{
         background: 'var(--bg-elevated)',
@@ -28,12 +30,12 @@ function makeTooltip(hidden) {
         borderRadius: 8,
         padding: '0.5rem 0.75rem',
         fontSize: 11,
-        maxWidth: 200,
+        maxWidth: 220,
         maxHeight: 180,
         overflowY: 'hidden',
         pointerEvents: 'none',
       }}>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{header}</p>
         {shown.map((entry, i) => (
           <p key={i} style={{ color: entry.color, margin: '0.1rem 0', whiteSpace: 'nowrap' }}>
             {entry.name}: {entry.value >= 0 ? `+$${Number(entry.value).toFixed(2)}` : `-$${Math.abs(entry.value).toFixed(2)}`}
@@ -61,7 +63,10 @@ export default function CumulativeChart({ sessions, players }) {
     players.forEach(p => { cumulatives[p.id] = 0 })
 
     return closed.map(session => {
-      const point = { name: new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }
+      const point = {
+        name: new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+        _label: session.name,
+      }
       players.forEach(p => {
         const entry = session.session_entries?.find(e => e.player_id === p.id)
         if (entry && entry.cashout !== null) {
