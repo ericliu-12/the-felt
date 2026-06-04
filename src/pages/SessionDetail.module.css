@@ -39,7 +39,7 @@
 
 .tableHead {
   display: grid;
-  grid-template-columns: 1fr 90px 90px 80px;
+  grid-template-columns: 1fr 90px 90px 80px 32px;
   padding: 0.5rem 1rem;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
@@ -58,7 +58,7 @@
 
 .entryRow {
   display: grid;
-  grid-template-columns: 1fr 90px 90px 80px;
+  grid-template-columns: 1fr 90px 90px 80px 32px;
   align-items: center;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-subtle);
@@ -308,3 +308,17 @@
 
 .shareBtn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 .shareBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--red);
+  opacity: 0.4;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: opacity var(--transition);
+}
+
+.removeBtn:hover { opacity: 1; }

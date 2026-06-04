@@ -16,7 +16,7 @@ import styles from './SessionDetail.module.css'
 export default function SessionDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { session, entries, loading, error, addEntry, updateEntry, closeSession, renameSession, reopenSession } = useSession(id)
+  const { session, entries, loading, error, addEntry, updateEntry, closeSession, renameSession, reopenSession, deleteEntry } = useSession(id)
   const { players, addPlayer } = usePlayers()
   const { isAdmin } = useAdminMode()
   const [mutErr, setMutErr]       = useState(null)
@@ -88,6 +88,11 @@ export default function SessionDetail() {
     if (!confirm('Reopen this session? Players will be able to edit cash-outs again.')) return
     setSaving(true); setMutErr(null)
     try { await reopenSession() } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
+  }
+
+  async function handleRemoveEntry(entryId) {
+    setMutErr(null)
+    try { await deleteEntry(entryId) } catch (e) { setMutErr(e.message) }
   }
 
   async function handleShare() {
@@ -169,6 +174,7 @@ export default function SessionDetail() {
           <span className={styles.th}>Buy-in</span>
           <span className={styles.th}>Cash-out</span>
           <span className={styles.th}>Net</span>
+          <span className={styles.th} />
         </div>
         {entries.map(e => {
           const net = e.cashout !== null ? e.cashout - e.total_buyin : null
@@ -210,6 +216,15 @@ export default function SessionDetail() {
               >
                 {net === null ? '—' : net >= 0 ? `+$${net.toFixed(2)}` : `-$${Math.abs(net).toFixed(2)}`}
               </span>
+              {isOpen && (
+                <button
+                  className={styles.removeBtn}
+                  onClick={ev => { ev.stopPropagation(); handleRemoveEntry(e.id) }}
+                  aria-label={`Remove ${e.playerName}`}
+                >
+                  ×
+                </button>
+              )}
             </div>
           )
         })}
