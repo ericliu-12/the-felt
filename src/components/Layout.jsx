@@ -18,7 +18,7 @@ export default function Layout() {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <span className={styles.logo}>The Felt</span>
+        <button className={styles.logo} onClick={() => go('/')}>The Felt</button>
         <div className={styles.headerRight}>
           <button
             className={`${styles.adminBtn} ${isAdmin ? styles.adminActive : ''}`}

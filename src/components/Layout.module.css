@@ -26,6 +26,10 @@
   color: var(--gold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .headerRight {
