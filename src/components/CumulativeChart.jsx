@@ -29,6 +29,8 @@ function makeTooltip(hidden) {
         padding: '0.5rem 0.75rem',
         fontSize: 11,
         maxWidth: 200,
+        maxHeight: 180,
+        overflowY: 'hidden',
         pointerEvents: 'none',
       }}>
         <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
@@ -59,7 +61,7 @@ export default function CumulativeChart({ sessions, players }) {
     players.forEach(p => { cumulatives[p.id] = 0 })
 
     return closed.map(session => {
-      const point = { name: session.name }
+      const point = { name: new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) }
       players.forEach(p => {
         const entry = session.session_entries?.find(e => e.player_id === p.id)
         if (entry && entry.cashout !== null) {
@@ -86,7 +88,7 @@ export default function CumulativeChart({ sessions, players }) {
   return (
     <div>
       <ResponsiveContainer width="100%" height={240}>
-        <LineChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
           <XAxis
             dataKey="name"
@@ -100,7 +102,7 @@ export default function CumulativeChart({ sessions, players }) {
             tickLine={false}
             tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
           />
-          <Tooltip content={makeTooltip(hidden)} position={{ y: 8 }} />
+          <Tooltip content={makeTooltip(hidden)} />
           {players.map((p, idx) => (
             <Line
               key={p.id}
