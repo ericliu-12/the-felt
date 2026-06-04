@@ -4,29 +4,39 @@ import {
   Legend, ResponsiveContainer,
 } from 'recharts'
 
-function CompactTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div style={{
-      background: 'var(--bg-elevated)',
-      border: '1px solid var(--border)',
-      borderRadius: 8,
-      padding: '0.375rem 0.625rem',
-      fontSize: 11,
-      maxWidth: 140,
-      pointerEvents: 'none',
-    }}>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
-      {payload.map((entry, i) => (
-        <p key={i} style={{ color: entry.color, margin: '0.1rem 0', whiteSpace: 'nowrap' }}>
-          {entry.name}: ${Number(entry.value).toFixed(2)}
-        </p>
-      ))}
-    </div>
-  )
-}
+const COLORS = [
+  '#c9a84c', '#4caf7d', '#e05252', '#7b9fe0', '#e07bb0', '#7be0d4',
+  '#e09c5a', '#9b7be0', '#5ae0a0', '#e0d45a', '#5ab8e0', '#e07b5a',
+  '#a0e05a', '#e05ab8',
+]
 
-const COLORS = ['#c9a84c', '#4caf7d', '#e05252', '#7b9fe0', '#e07bb0', '#7be0d4']
+function makeTooltip(hidden) {
+  return function CompactTooltip({ active, payload, label }) {
+    if (!active || !payload?.length) return null
+    const visible = [...payload]
+      .filter(e => !hidden.has(e.dataKey))
+      .sort((a, b) => b.value - a.value)
+    if (!visible.length) return null
+    return (
+      <div style={{
+        background: 'var(--bg-elevated)',
+        border: '1px solid var(--border)',
+        borderRadius: 8,
+        padding: '0.5rem 0.75rem',
+        fontSize: 11,
+        maxWidth: 200,
+        pointerEvents: 'none',
+      }}>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
+        {visible.map((entry, i) => (
+          <p key={i} style={{ color: entry.color, margin: '0.1rem 0', whiteSpace: 'nowrap' }}>
+            {entry.name}: {entry.value >= 0 ? `+$${Number(entry.value).toFixed(2)}` : `-$${Math.abs(entry.value).toFixed(2)}`}
+          </p>
+        ))}
+      </div>
+    )
+  }
+}
 
 export default function CumulativeChart({ sessions, players }) {
   const [hidden, setHidden] = useState(new Set())
@@ -67,7 +77,7 @@ export default function CumulativeChart({ sessions, players }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={240}>
+    <ResponsiveContainer width="100%" height={280}>
       <LineChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
         <XAxis
@@ -80,12 +90,12 @@ export default function CumulativeChart({ sessions, players }) {
           tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={v => `$${v}`}
+          tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
         />
-        <Tooltip content={<CompactTooltip />} position={{ y: 0 }} />
+        <Tooltip content={makeTooltip(hidden)} />
         <Legend
           onClick={e => togglePlayer(e.dataKey)}
-          wrapperStyle={{ fontSize: 12, cursor: 'pointer' }}
+          wrapperStyle={{ fontSize: 11, cursor: 'pointer' }}
         />
         {players.map((p, idx) => (
           <Line

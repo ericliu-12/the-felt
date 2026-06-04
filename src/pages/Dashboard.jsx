@@ -70,7 +70,7 @@ export default function Dashboard() {
       {sessions.length > 0 && (
         <div className={styles.section}>
           <span className={styles.sectionTitle}>Cumulative P&amp;L</span>
-          <div className={styles.card}>
+          <div className={styles.card} style={{ overflow: 'visible' }}>
             <CumulativeChart sessions={sessions} players={players} />
           </div>
         </div>
