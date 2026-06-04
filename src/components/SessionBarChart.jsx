@@ -14,17 +14,26 @@ export default function SessionBarChart({ entries }) {
 
   if (!data.length) return null
 
+  const height = Math.max(180, data.length * 40)
+
   return (
-    <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-        <XAxis
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart
+        data={data}
+        layout="vertical"
+        margin={{ top: 4, right: 48, left: 8, bottom: 4 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+        <YAxis
+          type="category"
           dataKey="name"
-          tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
+          width={90}
+          tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
           axisLine={false}
           tickLine={false}
         />
-        <YAxis
+        <XAxis
+          type="number"
           tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
           axisLine={false}
           tickLine={false}
@@ -36,7 +45,7 @@ export default function SessionBarChart({ entries }) {
           itemStyle={{ color: 'var(--text)' }}
           formatter={v => [`$${Number(v).toFixed(2)}`, 'Profit']}
         />
-        <Bar dataKey="profit" radius={[4, 4, 0, 0]}>
+        <Bar dataKey="profit" radius={[0, 4, 4, 0]}>
           {data.map((d, i) => (
             <Cell key={i} fill={d.profit >= 0 ? 'var(--green)' : 'var(--red)'} />
           ))}
