@@ -27,7 +27,7 @@ export default function SessionBarChart({ entries }) {
         <YAxis
           type="category"
           dataKey="name"
-          width={90}
+          width={110}
           tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
           axisLine={false}
           tickLine={false}
@@ -37,7 +37,7 @@ export default function SessionBarChart({ entries }) {
           tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={v => `$${v}`}
+          tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
         />
         <Tooltip
           contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8 }}
