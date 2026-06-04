@@ -95,6 +95,7 @@ export function useSession(id) {
       .delete()
       .eq('id', entryId)
     if (error) throw new Error(error.message)
+    setEntries(prev => prev.filter(e => e.id !== entryId))
   }
 
   return { session, entries, loading, error, addEntry, updateEntry, closeSession, deleteEntry, renameSession, reopenSession }
