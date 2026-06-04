@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  Legend, ResponsiveContainer,
+  ResponsiveContainer,
 } from 'recharts'
 
 const COLORS = [
@@ -10,6 +10,8 @@ const COLORS = [
   '#a0e05a', '#e05ab8',
 ]
 
+const MAX_TOOLTIP = 8
+
 function makeTooltip(hidden) {
   return function CompactTooltip({ active, payload, label }) {
     if (!active || !payload?.length) return null
@@ -17,6 +19,8 @@ function makeTooltip(hidden) {
       .filter(e => !hidden.has(e.dataKey))
       .sort((a, b) => b.value - a.value)
     if (!visible.length) return null
+    const shown = visible.slice(0, MAX_TOOLTIP)
+    const extra = visible.length - shown.length
     return (
       <div style={{
         background: 'var(--bg-elevated)',
@@ -28,11 +32,14 @@ function makeTooltip(hidden) {
         pointerEvents: 'none',
       }}>
         <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
-        {visible.map((entry, i) => (
+        {shown.map((entry, i) => (
           <p key={i} style={{ color: entry.color, margin: '0.1rem 0', whiteSpace: 'nowrap' }}>
             {entry.name}: {entry.value >= 0 ? `+$${Number(entry.value).toFixed(2)}` : `-$${Math.abs(entry.value).toFixed(2)}`}
           </p>
         ))}
+        {extra > 0 && (
+          <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0 0', fontStyle: 'italic' }}>+{extra} more</p>
+        )}
       </div>
     )
   }
@@ -77,39 +84,62 @@ export default function CumulativeChart({ sessions, players }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={280}>
-      <LineChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-        <XAxis
-          dataKey="name"
-          tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
-          axisLine={{ stroke: 'var(--border)' }}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
-          axisLine={false}
-          tickLine={false}
-          tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
-        />
-        <Tooltip content={makeTooltip(hidden)} />
-        <Legend
-          onClick={e => togglePlayer(e.dataKey)}
-          wrapperStyle={{ fontSize: 11, cursor: 'pointer' }}
-        />
-        {players.map((p, idx) => (
-          <Line
-            key={p.id}
-            type="monotone"
-            dataKey={p.id}
-            name={p.name}
-            stroke={COLORS[idx % COLORS.length]}
-            strokeWidth={hidden.has(p.id) ? 0 : 2}
-            dot={false}
-            activeDot={{ r: 4 }}
+    <div>
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <XAxis
+            dataKey="name"
+            tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
+            axisLine={{ stroke: 'var(--border)' }}
+            tickLine={false}
           />
+          <YAxis
+            tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
+          />
+          <Tooltip content={makeTooltip(hidden)} position={{ y: 8 }} />
+          {players.map((p, idx) => (
+            <Line
+              key={p.id}
+              type="monotone"
+              dataKey={p.id}
+              name={p.name}
+              stroke={COLORS[idx % COLORS.length]}
+              strokeWidth={hidden.has(p.id) ? 0 : 2}
+              dot={false}
+              activeDot={{ r: 4 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem 0.625rem', marginTop: '0.625rem', paddingLeft: '0.5rem' }}>
+        {players.map((p, idx) => (
+          <button
+            key={p.id}
+            onClick={() => togglePlayer(p.id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              padding: '0.125rem 0',
+              opacity: hidden.has(p.id) ? 0.3 : 1,
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              transition: 'opacity 0.15s',
+            }}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: COLORS[idx % COLORS.length], flexShrink: 0, display: 'inline-block' }} />
+            {p.name}
+          </button>
         ))}
-      </LineChart>
-    </ResponsiveContainer>
+      </div>
+    </div>
   )
 }
