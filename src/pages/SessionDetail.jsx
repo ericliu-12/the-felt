@@ -91,8 +91,9 @@ export default function SessionDetail() {
   }
 
   async function handleRemoveEntry(entryId) {
-    setMutErr(null)
-    try { await deleteEntry(entryId) } catch (e) { setMutErr(e.message) }
+    if (saving) return
+    setSaving(true); setMutErr(null)
+    try { await deleteEntry(entryId) } catch (e) { setMutErr(e.message) } finally { setSaving(false) }
   }
 
   async function handleShare() {
@@ -219,6 +220,7 @@ export default function SessionDetail() {
               {isOpen && (
                 <button
                   className={styles.removeBtn}
+                  disabled={saving}
                   onClick={ev => { ev.stopPropagation(); handleRemoveEntry(e.id) }}
                   aria-label={`Remove ${e.playerName}`}
                 >
