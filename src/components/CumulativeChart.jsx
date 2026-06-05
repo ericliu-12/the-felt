@@ -31,8 +31,6 @@ function makeTooltip(hidden) {
         padding: '0.5rem 0.75rem',
         fontSize: 11,
         maxWidth: 220,
-        maxHeight: 180,
-        overflowY: 'hidden',
         pointerEvents: 'none',
       }}>
         <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{header}</p>
