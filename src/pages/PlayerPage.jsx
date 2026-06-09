@@ -102,12 +102,13 @@ export default function PlayerPage() {
       {history.length > 0 && (
         <>
           <span className={styles.sectionTitle}>Cumulative P&amp;L</span>
-          <div className={styles.card}>
+          <div className={styles.card} style={{ overflow: 'visible' }}>
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={history} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+              <LineChart data={history} margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
-                  dataKey="sessionName"
+                  dataKey="date"
+                  tickFormatter={v => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
                   tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                   axisLine={{ stroke: 'var(--border)' }}
                   tickLine={false}
@@ -116,13 +117,18 @@ export default function PlayerPage() {
                   tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={v => `$${v}`}
+                  tickFormatter={v => v < 0 ? `-$${Math.abs(v)}` : `$${v}`}
                 />
                 <Tooltip
-                  contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8 }}
-                  labelStyle={{ color: 'var(--text)' }}
-                  itemStyle={{ color: 'var(--text)' }}
-                  formatter={(v) => [`$${Number(v).toFixed(2)}`]}
+                  contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, pointerEvents: 'none' }}
+                  labelStyle={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}
+                  itemStyle={{ color: 'var(--gold)' }}
+                  labelFormatter={v => {
+                    const entry = history.find(h => h.date === v)
+                    const date = new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+                    return entry ? `${entry.sessionName} — ${date}` : date
+                  }}
+                  formatter={v => [v >= 0 ? `+$${Number(v).toFixed(2)}` : `-$${Math.abs(v).toFixed(2)}`, 'Cumulative P&L']}
                 />
                 <Line
                   type="monotone"
